@@ -1,6 +1,6 @@
 # users/forms.py
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from .models import Student
 
 class StudentRegisterForm(UserCreationForm):
@@ -46,3 +46,27 @@ class StudentRegisterForm(UserCreationForm):
 class StudentLoginForm(AuthenticationForm):
     username = forms.CharField(label="نام کاربری یا شماره دانشجویی")
     password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput)
+
+class StudentCSVUploadForm(forms.Form):
+    csv_file = forms.FileField(
+        label="فایل CSV دانشجویان",
+        help_text="فایل باید شامل ستون‌های student_id و email باشد."
+    )
+
+class PersianPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["old_password"].label = "رمز عبور فعلی"
+        self.fields["new_password1"].label = "رمز عبور جدید"
+        self.fields["new_password2"].label = "تأیید رمز عبور جدید"
+
+        self.fields["old_password"].help_text = ""
+        self.fields["new_password1"].help_text = "رمز جدید باید حداقل ۸ کاراکتر و ترکیبی از عدد و حرف باشد."
+        self.fields["new_password2"].help_text = "رمز جدید را دوباره برای تأیید وارد کنید."
+
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand",
+                "autocomplete": "off",
+                "dir": "ltr"
+            })
