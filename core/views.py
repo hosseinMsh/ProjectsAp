@@ -52,24 +52,42 @@ def export_csv(request):
     return response
 
 def _is_rep(user):
+    """Check if the user is a representative"""
     return getattr(user, "is_representative", False)
+
 
 @login_required
 def team_create(request):
-    if not _is_rep(request.user):
-        messages.error(request, "Only representatives can create a team.")
+    user = request.user
+
+    
+    if not _is_rep(user):
+        messages.error(request, "❌ فقط نماینده‌ها می‌توانند تیم ایجاد کنند.")
         return redirect("dashboard")
+
+    if hasattr(user, "rep_teams"):
+        messages.warning(request, "⚠️ شما قبلاً یک تیم ساخته‌اید و نمی‌توانید تیم جدیدی ایجاد کنید.")
+        return redirect("dashboard")
+
     if request.method == "POST":
         form = TeamCreateForm(request.POST)
         if form.is_valid():
             team = form.save(commit=False)
-            team.representative = request.user
+            team.representative = user
             team.save()
-            team.members.add(request.user)  # include rep in members set for size validation convenience
-            messages.success(request, "Team created.")
+
+
+            team.members.add(user)
+            user.is_representative = True
+            user.save(update_fields=["is_representative"])
+
+            messages.success(request, f"✅ تیم «{team.name}» با موفقیت ایجاد شد.")
             return redirect("projects:team_manage", pk=team.pk)
+        else:
+            messages.error(request, "❌ اطلاعات وارد شده معتبر نیست. لطفاً دوباره بررسی کنید.")
     else:
         form = TeamCreateForm()
+
     return render(request, "projects/team_create.html", {"form": form})
 
 @login_required
