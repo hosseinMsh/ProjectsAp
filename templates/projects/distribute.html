@@ -1,0 +1,52 @@
+<!-- templates/projects/distribute.html -->
+{% extends "base.html" %}
+{% block title %}توزیع خودکار پروژه‌ها{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-brand mb-4">🎯 توزیع خودکار پروژه‌ها بین تیم‌ها</h1>
+
+{% if not cfg.distribution_done %}
+  <form method="post" class="bg-white p-5 rounded shadow max-w-xl mx-auto">
+    {% csrf_token %}
+    <p class="mb-3">در صورت تأیید، سامانه به‌صورت خودکار پروژه‌ها را بین تیم‌ها پخش می‌کند.</p>
+    <button class="bg-brand text-white px-4 py-2 rounded hover:bg-blue-800">اجرای توزیع خودکار</button>
+  </form>
+{% else %}
+  <div class="bg-green-50 border border-green-300 p-4 rounded text-green-800">
+    ✅ توزیع انجام شده است.
+  </div>
+{% endif %}
+
+<h2 class="mt-6 text-lg font-bold text-gray-700">وضعیت تیم‌ها</h2>
+<table class="min-w-full mt-3 bg-white rounded border text-sm">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="p-2">تیم</th>
+      <th class="p-2">نماینده</th>
+      <th class="p-2">پروژه نهایی</th>
+      <th class="p-2">وضعیت</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in teams %}
+      <tr class="border-t hover:bg-gray-50">
+        <td class="p-2">{{ t.name }}</td>
+        <td class="p-2">{{ t.representative.get_full_name }}</td>
+        <td class="p-2">{% if t.final_project %}{{ t.final_project.title }}{% else %}-{% endif %}</td>
+        <td class="p-2">
+          {% if t.status == 'assigned' %}
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded">تخصیص یافت</span>
+          {% elif t.status == 'submitted' %}
+            <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">در انتظار</span>
+          {% else %}
+            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded">پیش‌نویس</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="mt-4">
+  <a href="{% url 'projects:export_csv' %}" class="bg-gray-800 text-white px-4 py-2 rounded">📤 خروجی CSV</a>
+</div>
+{% endblock %}

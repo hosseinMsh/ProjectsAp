@@ -1,0 +1,59 @@
+<!-- templates/projects/admin_assign.html -->
+{% extends "base.html" %}
+{% block title %}Admin Assign{% endblock %}
+{% block content %}
+    <h1 class="text-2xl font-bold text-brand mb-4">تخصیص نهایی پروژه‌ها</h1>
+    <div class="overflow-x-auto bg-white border rounded">
+        <table class="min-w-full text-sm">
+            <thead class="bg-gray-100">
+            <tr>
+                <th class="p-2 text-right">Team</th>
+                <th class="p-2 text-right">Choice 1</th>
+                <th class="p-2 text-right">Choice 2</th>
+                <th class="p-2 text-right">Choice 3</th>
+                <th class="p-2 text-right">Status</th>
+                <th class="p-2 text-right">Assign</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for t in teams %}
+                <tr class="border-t">
+                    <td class="p-2">{{ t.name }}</td>
+                    <td class="p-2">{{ t.project_choice_1 }}</td>
+                    <td class="p-2">{{ t.project_choice_2 }}</td>
+                    <td class="p-2">{{ t.project_choice_3 }}</td>
+                    <td class="p-2">{{ t.get_status_display }}</td>
+                    <td class="p-2">
+                        <form method="post" class="flex gap-2 items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="team_id" value="{{ t.id }}">
+                            <select name="project_id" class="border rounded px-2 py-1">
+                                {% if t.project_choice_1 %}
+                                    <option value="{{ t.project_choice_1.id }}"
+                                            {% if t.final_project and t.final_project.id == t.project_choice_1.id %}selected{% endif %}>
+                                        {{ t.project_choice_1.title }}
+                                    </option>
+                                {% endif %}
+                                {% if t.project_choice_2 %}
+                                    <option value="{{ t.project_choice_2.id }}"
+                                            {% if t.final_project and t.final_project.id == t.project_choice_2.id %}selected{% endif %}>
+                                        {{ t.project_choice_2.title }}
+                                    </option>
+                                {% endif %}
+                                {% if t.project_choice_3 %}
+                                    <option value="{{ t.project_choice_3.id }}"
+                                            {% if t.final_project and t.final_project.id == t.project_choice_3.id %}selected{% endif %}>
+                                        {{ t.project_choice_3.title }}
+                                    </option>
+                                {% endif %}
+                            </select>
+
+                            <button class="bg-brand text-white px-3 py-1 rounded">Assign</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

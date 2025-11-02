@@ -1,0 +1,62 @@
+<!-- templates/base.html -->
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Project Registration{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {theme: {extend: {colors: {brand: "#1966ab"}}}};
+    </script>
+    <style>
+        input, select, textarea {
+            font-family: "Vazirmatn", "Segoe UI", sans-serif;
+            direction: rtl;
+        }
+
+        label {
+            direction: rtl;
+        }
+    </style>
+
+
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+<header class="bg-brand text-white shadow">
+    <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
+        <a href="/" class="font-bold text-lg">🔷 سامانه پروژه‌ها</a>
+        <nav class="flex gap-3 text-sm">
+            <a href="/" class="hover:underline">خانه</a>
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'projects:admin_assign' %}">مدیریت</a>
+                <a href="{% url 'projects:distribute' %}">توزیع خودکار</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <form action="{% url 'users:logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="hover:underline text-red-600">خروج</button>
+                </form>
+            {% else %}
+                <a href="{% url 'users:login' %}">ورود</a>
+                <a href="{% url 'users:register' %}">ثبت‌نام</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="flex-1 max-w-5xl mx-auto w-full p-4">
+    {% for message in messages %}
+        <div class="p-3 rounded mb-3 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-white border-t py-3 text-center text-xs text-gray-500">
+    © 2025 Sharif AP Portal • Developed by Hossein Masihi
+</footer>
+</body>
+</html>

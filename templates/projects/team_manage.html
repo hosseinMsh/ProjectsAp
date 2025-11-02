@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}مدیریت تیم{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-8">
+  <div class="bg-white border border-gray-200 shadow-sm rounded-2xl p-6">
+    
+    <h1 class="text-2xl font-bold text-brand mb-4">👥 مدیریت تیم: {{ team.name }}</h1>
+    <p class="text-gray-600 mb-4">
+      در این بخش می‌توانید اعضای تیم خود را مشخص کنید.  
+      هر تیم باید حداقل <strong>۳ نفر</strong> و حداکثر <strong>۴ نفر</strong> باشد.  
+      فقط <strong>۲ تیم</strong> می‌توانند ۴ نفره باشند.
+    </p>
+
+    <div class="bg-gray-50 border rounded-lg p-4 mb-5">
+      <p class="font-semibold text-gray-700 mb-2">📋 اعضای فعلی تیم:</p>
+      <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+        {% for m in team.members.all %}
+          <li>
+            {{ m.get_full_name }} — <span class="text-gray-500">{{ m.student_id }}</span>
+            {% if m == team.representative %}
+              <span class="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded ml-2">نماینده</span>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="text-gray-500 italic">هیچ عضوی هنوز اضافه نشده است.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.member_student_ids.id_for_label }}" class="block text-gray-800 font-semibold mb-1">
+          شماره‌های دانشجویی اعضا
+        </label>
+        {{ form.member_student_ids|add_class:"w-full h-40 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand" }}
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+          هر شماره دانشجویی را در یک خط بنویسید.  
+          <strong>نماینده تیم را وارد نکنید</strong> (سیستم او را به‌صورت خودکار اضافه می‌کند).
+        </p>
+        {% if form.member_student_ids.errors %}
+          {% for error in form.member_student_ids.errors %}
+            <p class="text-sm text-red-600 mt-1">⚠ {{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="flex justify-between items-center pt-4">
+        <button type="submit"
+          class="bg-brand hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
+          💾 ذخیره اعضا
+        </button>
+
+        <a href="{% url 'projects:project_select' team.pk %}"
+           class="bg-gray-800 hover:bg-gray-900 text-white font-semibold px-5 py-2 rounded-lg shadow transition">
+          🎯 انتخاب ۳ پروژه
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

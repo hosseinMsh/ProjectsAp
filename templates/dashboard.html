@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}داشبورد{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto mt-6">
+
+  <!-- خوش‌آمدگویی -->
+  <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 mb-6">
+    <h1 class="text-2xl font-bold text-brand mb-2">🎓 خوش آمدی، {{ user.first_name|default:user.username }}!</h1>
+    <p class="text-gray-600">
+      {% if user.is_representative %}
+        شما نماینده‌ی یک تیم هستید. از اینجا می‌توانید تیم‌تان را مدیریت کنید، اعضا را اضافه کنید و پروژه‌تان را انتخاب کنید.
+      {% else %}
+        شما عضو تیم هستید. می‌توانید اطلاعات تیم و پروژه‌ی خود را مشاهده کنید.
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- وضعیت تیم -->
+  <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 mb-6">
+    <h2 class="text-xl font-semibold text-brand mb-4">👥 وضعیت تیم شما</h2>
+    {% if user.teams.all %}
+      {% for team in user.teams.all %}
+        <div class="border rounded-lg p-4 mb-4 bg-gray-50">
+          <p><strong>نام تیم:</strong> {{ team.name }}</p>
+          <p><strong>نماینده:</strong> {{ team.representative.get_full_name }}</p>
+          <p><strong>تعداد اعضا:</strong> {{ team.members.count }}</p>
+
+          {% if team.status == "draft" %}
+            <p class="mt-2 text-yellow-600 font-semibold">📋 وضعیت: در حال ثبت‌نام / تکمیل تیم</p>
+          {% elif team.status == "submitted" %}
+            <p class="mt-2 text-blue-700 font-semibold">⏳ وضعیت: انتخاب پروژه انجام شده و در انتظار تأیید</p>
+          {% elif team.status == "assigned" %}
+            <p class="mt-2 text-green-700 font-semibold">✅ پروژه نهایی تخصیص داده شده</p>
+            <p><strong>پروژه:</strong> {{ team.final_project.title }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      {% if user.is_representative %}
+        <p class="text-gray-600">شما هنوز تیمی ایجاد نکرده‌اید.</p>
+        <a href="{% url 'projects:team_create' %}" class="mt-3 inline-block bg-brand text-white px-5 py-2 rounded-lg shadow hover:bg-blue-800">
+          ➕ ایجاد تیم جدید
+        </a>
+      {% else %}
+        <p class="text-gray-600">شما هنوز در هیچ تیمی عضو نیستید. منتظر باشید تا نماینده‌ی تیم شما را اضافه کند.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <!-- کارت‌های سریع -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% if user.is_representative %}
+      <a href="{% url 'projects:team_create' %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">➕ ایجاد تیم</h3>
+        <p class="text-gray-600 text-sm">تیم جدید بساز و اعضا را اضافه کن.</p>
+      </a>
+      <a href="{% if user.teams.first %}{% url 'projects:team_manage' user.teams.first.id %}{% else %}#{% endif %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">👥 مدیریت اعضا</h3>
+        <p class="text-gray-600 text-sm">اعضای تیم را اضافه یا حذف کن.</p>
+      </a>
+      <a href="{% if user.teams.first %}{% url 'projects:project_select' user.teams.first.id %}{% else %}#{% endif %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">🎯 انتخاب پروژه</h3>
+        <p class="text-gray-600 text-sm">سه پروژه‌ی مورد علاقه را برای تیم انتخاب کن.</p>
+      </a>
+    {% endif %}
+
+    {% if user.is_staff %}
+      <a href="{% url 'projects:admin_assign' %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">🛠️ مدیریت پروژه‌ها</h3>
+        <p class="text-gray-600 text-sm">انتخاب‌ها را ببین و پروژه‌ها را تخصیص بده.</p>
+      </a>
+      <a href="{% url 'projects:distribute' %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">🤖 توزیع خودکار</h3>
+        <p class="text-gray-600 text-sm">پروژه‌ها را خودکار بین تیم‌ها پخش کن.</p>
+      </a>
+      <a href="{% url 'projects:export_csv' %}" class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+        <h3 class="font-bold text-brand mb-1">📤 خروجی CSV</h3>
+        <p class="text-gray-600 text-sm">لیست تیم‌ها و پروژه‌ها را دریافت کن.</p>
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
