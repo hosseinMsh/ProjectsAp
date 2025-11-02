@@ -62,6 +62,7 @@ class Team(models.Model):
                     sz=models.Count("members")
                 ).filter(sz=3).count()  # sz=3 + representative => 4
                 if four_count >= 2:
+                    #chenge here to max 4 members teams
                     raise ValidationError(_("Only two teams of size 4 are allowed."))
 
             # ensure final_project consistency with choices
