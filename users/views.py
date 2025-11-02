@@ -1,10 +1,21 @@
 # users/views.py
+import csv
+
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .forms import StudentRegisterForm, StudentLoginForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from .forms import StudentRegisterForm, StudentLoginForm, StudentCSVUploadForm, PersianPasswordChangeForm
 from django.contrib.auth import authenticate
 
+from .utils.create_students_from_csv import create_students_from_csv
+
+
+@staff_member_required
 def register(request):
     if request.method == "POST":
         print("Aaa")
@@ -24,8 +35,21 @@ def login_view(request):
     if request.method == "POST" and form.is_valid():
         user = form.get_user()
         login(request, user)
+        if getattr(user, "must_change_password", False):
+            return redirect("users:force_password_change")
         return redirect("dashboard")
     return render(request, "users/login.html", {"form": form})
+
+@login_required
+def force_password_change(request):
+    form = PersianPasswordChangeForm(user=request.user, data=request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        user.must_change_password = False
+        user.save()
+        update_session_auth_hash(request, user)
+        return redirect("dashboard")
+    return render(request, "users/force_password_change.html", {"form": form})
 
 @login_required
 def dashboard(request):
