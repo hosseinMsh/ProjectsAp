@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}آپلود لیست دانشجویان{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10">
+  <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-8">
+    <h1 class="text-2xl font-bold text-brand mb-4">📥 آپلود لیست دانشجویان</h1>
+    <p class="text-gray-600 mb-6">
+      فایل CSV باید شامل دو ستون <code class="bg-gray-100 px-1 rounded">student_id</code> و <code class="bg-gray-100 px-1 rounded">email</code> باشد.
+      <br>پس از آپلود، برای هر دانشجو رمز تصادفی ساخته شده و فایل خروجی آماده دانلود خواهد شد.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5">
+      {% csrf_token %}
+      <div>
+        <label class="block text-gray-800 font-semibold mb-1">{{ form.csv_file.label }}</label>
+        {{ form.csv_file }}
+        {% if form.csv_file.help_text %}
+          <p class="text-xs text-gray-500 mt-1">{{ form.csv_file.help_text }}</p>
+        {% endif %}
+        {% for error in form.csv_file.errors %}
+          <p class="text-sm text-red-600 mt-1">⚠ {{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="text-center pt-4">
+        <button type="submit"
+          class="bg-brand hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
+          ✅ ساخت حساب‌ها و دریافت فایل خروجی
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -30,3 +30,44 @@ def login_view(request):
 @login_required
 def dashboard(request):
     return render(request, "dashboard.html")
+
+
+@staff_member_required
+def upload_students(request):
+    result = None
+    if request.method == "POST":
+        form = StudentCSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.cleaned_data["csv_file"]
+            created_users = create_students_from_csv(file)
+
+            response = HttpResponse(content_type="text/csv")
+            response["Content-Disposition"] = 'attachment; filename="created_students.csv"'
+            writer = csv.writer(response)
+            writer.writerow(["student_id", "email", "password"])
+            for sid, email, pwd in created_users:
+                writer.writerow([sid, email, pwd])
+            return response
+    else:
+        form = StudentCSVUploadForm()
+    return render(request, "users/upload_students.html", {"form": form})
+
+
+@login_required
+def force_password_change(request):
+    """Require students to change password after first login"""
+    user = request.user
+    form = PersianPasswordChangeForm(user, request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            user.must_change_password = False
+            user.save(update_fields=["must_change_password"])
+            update_session_auth_hash(request, user)
+            messages.success(request, "✅ رمز عبور شما با موفقیت تغییر کرد.")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "⚠️ لطفاً خطاهای زیر را بررسی کنید.")
+
+    return render(request, "users/force_password_change.html", {"form": form})
