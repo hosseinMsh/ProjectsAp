@@ -87,7 +87,12 @@
                 </a>
                 <a href="{% url 'users:upload_students' %}"
                    class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
-                    <h3 class="font-bold text-brand mb-1">افزودن کاربر</h3>
+                    <h3 class="font-bold text-brand mb-1">افزودن گروهی کاربر</h3>
+                    <p class="text-gray-600 text-sm">با لیست خود شامل ایمیل وشماره دانشجویی کاربر اضافه کنید.</p>
+                </a>
+                <a href="{% url 'users:register' %}"
+                   class="block bg-white rounded-xl shadow hover:shadow-md p-5 border border-gray-200 hover:border-brand transition">
+                    <h3 class="font-bold text-brand mb-1">افزودن تکی کاربر</h3>
                     <p class="text-gray-600 text-sm">با لیست خود شامل ایمیل وشماره دانشجویی کاربر اضافه کنید.</p>
                 </a>
                 <a href="{% url 'projects:export_csv' %}"
