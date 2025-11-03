@@ -25,8 +25,9 @@ SECRET_KEY = "django-insecure-n-eb3-$m#p0_f*frk%jd^a2jubovtq1s!(nvo^%hil*^kgr@yz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS=['https://fctfd-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link/',
+                      'http://haijc-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link']
 
 # Application definition
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "users.middleware.ForcePasswordChangeMiddleware",
+    "users.middleware.LoginRateLimitMiddleware",
 ]
 
 ROOT_URLCONF = "ProjectAp.urls"
@@ -72,6 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ProjectAp.wsgi.application"
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-login-limit",
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
