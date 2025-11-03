@@ -70,3 +70,28 @@ class PersianPasswordChangeForm(PasswordChangeForm):
                 "autocomplete": "off",
                 "dir": "ltr"
             })
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ["github_email", "github_username", "telegram_link"]
+        labels = {
+            "github_email": "ایمیل GitHub",
+            "github_username": "نام کاربری GitHub",
+            "telegram_link": "آدرس تلگرام",
+        }
+        help_texts = {
+            "github_email": "در صورت تمایل می‌توانید ایمیل متصل به اکانت GitHub خود را وارد کنید.",
+            "github_username": "مثلاً: https://github.com/asd",
+            "telegram_link": "مثلاً: https://t.me/sad",
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand",
+                "dir": "ltr",
+                "placeholder": field.label
+            })
