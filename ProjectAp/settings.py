@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS=['https://fctfd-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link/',
                       'http://haijc-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link']
 
+
 # Application definition
 
 INSTALLED_APPS = [
