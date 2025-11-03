@@ -9,7 +9,8 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .forms import StudentRegisterForm, StudentLoginForm, StudentCSVUploadForm, PersianPasswordChangeForm
+from .forms import StudentRegisterForm, StudentLoginForm, StudentCSVUploadForm, PersianPasswordChangeForm, \
+    ProfileUpdateForm
 from django.contrib.auth import authenticate
 
 from .utils.create_students_from_csv import create_students_from_csv
@@ -18,7 +19,6 @@ from .utils.create_students_from_csv import create_students_from_csv
 @staff_member_required
 def register(request):
     if request.method == "POST":
-        print("Aaa")
         form = StudentRegisterForm(request.POST)
         if form.is_valid():
             form.save()
@@ -95,3 +95,19 @@ def force_password_change(request):
             messages.error(request, "⚠️ لطفاً خطاهای زیر را بررسی کنید.")
 
     return render(request, "users/force_password_change.html", {"form": form})
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    form = ProfileUpdateForm(request.POST or None, instance=user)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ اطلاعات شما با موفقیت به‌روزرسانی شد.")
+            return redirect("users:profile")
+        else:
+            messages.error(request, "⚠️ لطفاً خطاهای فرم را بررسی کنید.")
+
+    return render(request, "users/profile.html", {"form": form, "user": user})
