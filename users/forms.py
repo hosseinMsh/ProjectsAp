@@ -1,4 +1,5 @@
 # users/forms.py
+from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from .models import Student
@@ -44,6 +45,7 @@ class StudentRegisterForm(UserCreationForm):
 
 
 class StudentLoginForm(AuthenticationForm):
+    captcha = CaptchaField(label="کد امنیتی")
     username = forms.CharField(label="نام کاربری یا شماره دانشجویی")
     password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput)
 
