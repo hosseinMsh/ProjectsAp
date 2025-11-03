@@ -29,6 +29,8 @@
         <a href="/" class="font-bold text-lg">🔷 سامانه پروژه‌ها</a>
         <nav class="flex gap-3 text-sm">
             <a href="/" class="hover:underline">خانه</a>
+
+            <a href="{% url 'users:profile' %}" class="hover:underline"> پروفایل کاربری</a>
             <a href="{% url 'users:force_password_change' %}" class="hover:underline">تغیر رمز ورود</a>
             {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'projects:admin_assign' %}">مدیریت</a>
