@@ -2,19 +2,36 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Project Registration{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}سامانه ثبت پروژه‌ها{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <script>
-        tailwind.config = {theme: {extend: {colors: {brand: "#1966ab"}}}};
-    </script>
-    <style>
-        input, select, textarea {
-            font-family: "Vazirmatn", "Segoe UI", sans-serif;
-            direction: rtl;
-        }
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: { colors: { brand: "#1966ab" } }
+      }
+    };
+  </script>
+
+  <!-- فونت IRANSansX -->
+  <style>
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Regular.ttf") format("truetype");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Medium.ttf") format("truetype");
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Bold.ttf") format("truetype");
+      font-weight: 700;
+    }
 
         label {
             direction: rtl;
