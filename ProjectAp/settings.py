@@ -26,8 +26,8 @@ SECRET_KEY = "django-insecure-n-eb3-$m#p0_f*frk%jd^a2jubovtq1s!(nvo^%hil*^kgr@yz
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS=['https://fctfd-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link/',
-                      'http://haijc-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link']
+CSRF_TRUSTED_ORIGINS=['https://projects.shraif.ir',
+                      'http://projects.shraif.ir']
 
 
 # Application definition
@@ -141,3 +141,7 @@ AUTH_USER_MODEL = "users.Student"
 LOGIN_URL = "users:login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "users:login"
+CAPTCHA_IMAGE_SIZE = (280, 90)
+CAPTCHA_FONT_SIZE = 45
+# CAPTCHA_LENGTH = 6
+CAPTCHA_TIMEOUT = 5
