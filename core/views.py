@@ -1,7 +1,7 @@
 # projects/views.py
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.db import transaction, models
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -60,13 +60,18 @@ def _is_rep(user):
 def team_create(request):
     user = request.user
 
-    
+    # only representatives can create teams
     if not _is_rep(user):
         messages.error(request, "❌ فقط نماینده‌ها می‌توانند تیم ایجاد کنند.")
         return redirect("dashboard")
 
-    if hasattr(user, "rep_teams"):
-        messages.warning(request, "⚠️ شما قبلاً یک تیم ساخته‌اید و نمی‌توانید تیم جدیدی ایجاد کنید.")
+    # check if the user already belongs to any team (representative or member)
+    already_in_team = Team.objects.filter(
+        models.Q(representative=user) | models.Q(members=user)
+    ).exists()
+
+    if already_in_team:
+        messages.warning(request, "⚠️ شما عضو یک تیم هستید و نمی‌توانید تیم جدیدی ایجاد کنید.")
         return redirect("dashboard")
 
     if request.method == "POST":
@@ -76,8 +81,9 @@ def team_create(request):
             team.representative = user
             team.save()
 
+            # representative should NOT be added to members
+            # team.members.add(user)  ← remove this line
 
-            team.members.add(user)
             user.is_representative = True
             user.save(update_fields=["is_representative"])
 
@@ -176,3 +182,11 @@ def admin_assign(request):
         return redirect("projects:admin_assign")
 
     return render(request, "projects/admin_assign.html", {"teams": teams, "projects": projects})
+
+@staff_member_required
+def teams_overview(request):
+    teams = Team.objects.select_related("project_choice_1", "project_choice_2", "project_choice_3", "final_project", "representative").prefetch_related("members")
+
+    return render(request, "projects/teams_overview.html", {
+        "teams": teams
+    })

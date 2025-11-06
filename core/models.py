@@ -48,31 +48,46 @@ class Team(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
 
     def clean(self):
-        if self.pk:
-            # enforce size: two teams can have 4 members, others must have 3
-            size = self.members.count() + 1  # include representative
-            if size < 3:
-                raise ValidationError(_("Team must have at least 3 members (including representative)."))
-            if size > 4:
-                raise ValidationError(_("Team cannot have more than 4 members."))
+        super().clean()
 
-            # allow at most two teams of size 4
-            if size == 4:
-                four_count = Team.objects.exclude(pk=self.pk).annotate(
-                    sz=models.Count("members")
-                ).filter(sz=3).count()  # sz=3 + representative => 4
-                if four_count >= 2:
-                    #chenge here to max 4 members teams
-                    raise ValidationError(_("Only two teams of size 4 are allowed."))
+        # --- Enforce each student to be in only one team ---
 
-            # ensure final_project consistency with choices
-            if self.final_project:
-                if self.final_project not in [self.project_choice_1, self.project_choice_2, self.project_choice_3]:
-                    raise ValidationError(_("Final project must be one of the three chosen projects."))
+        # check representative uniqueness
+        # representative cannot be representative or member of another team
+        rep_conflict = Team.objects.exclude(pk=self.pk).filter(
+            models.Q(representative=self.representative) |
+            models.Q(members=self.representative)
+        )
+        if rep_conflict.exists():
+            raise ValidationError(_("Representative is already part of another team."))
 
-                # ensure project not assigned to other team
-                if self.final_project.assigned_team and self.final_project.assigned_team_id != self.id:
-                    raise ValidationError(_("This project is already assigned to another team."))
+        # check each member belongs to only one team
+        for m in self.members.all():
+            member_conflict = Team.objects.exclude(pk=self.pk).filter(
+                models.Q(representative=m) |
+                models.Q(members=m)
+            )
+            if member_conflict.exists():
+                raise ValidationError(_("A member is already part of another team."))
 
+        # --- your previous rules ---
+        size = self.members.count() + 1  # include representative
+        if size < 3:
+            raise ValidationError(_("Team must have at least 3 members (including representative)."))
+        if size > 4:
+            raise ValidationError(_("Team cannot have more than 4 members."))
+
+        if size == 4:
+            four_count = Team.objects.exclude(pk=self.pk).annotate(
+                sz=models.Count("members")
+            ).filter(sz=3).count()
+            if four_count >= 2:
+                raise ValidationError(_("Only two teams of size 4 are allowed."))
+
+        if self.final_project:
+            if self.final_project not in [self.project_choice_1, self.project_choice_2, self.project_choice_3]:
+                raise ValidationError(_("Final project must be one of the three chosen projects."))
+            if self.final_project.assigned_team and self.final_project.assigned_team_id != self.id:
+                raise ValidationError(_("This project is already assigned to another team."))
     def __str__(self):
         return f"{self.name}"

@@ -5,48 +5,67 @@
 {% block content %}
 <div class="max-w-2xl mx-auto mt-10">
   <div class="bg-white border border-gray-200 shadow-sm rounded-2xl p-8">
-    <h1 class="text-2xl font-bold text-brand mb-4">👥 ایجاد تیم جدید</h1>
-    <p class="text-gray-600 mb-6">
-      لطفاً نام تیم خود را وارد کنید. شما به‌عنوان <strong>نماینده</strong> شناخته می‌شوید و مسئول افزودن اعضا خواهید بود.
-    </p>
 
-    <form method="post" class="space-y-6">
-      {% csrf_token %}
+    {% if already_in_team %}
+      <h1 class="text-2xl font-bold text-red-600 mb-4">⚠ شما قبلاً عضو یک تیم هستید</h1>
+      <p class="text-gray-700 leading-relaxed">
+        شما در حال حاضر عضو تیم:
+        <strong class="text-brand">{{ team.name }}</strong>
+      </p>
+      <p class="mt-4 text-gray-600 text-sm">
+        برای تغییر اعضا یا مشاهده وضعیت، از صفحه مدیریت تیم خود استفاده کنید.
+      </p>
 
-      <div>
-        <label for="{{ form.name.id_for_label }}" class="block text-gray-800 font-semibold mb-1">
-          نام تیم
-        </label>
-        {{ form.name|add_class:"w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand" }}
-        {% if form.name.help_text %}
-          <p class="text-xs text-gray-500 mt-1">{{ form.name.help_text }}</p>
-        {% endif %}
-        {% if form.name.errors %}
-          {% for error in form.name.errors %}
-            <p class="text-sm text-red-600 mt-1">⚠ {{ error }}</p>
-          {% endfor %}
-        {% endif %}
+      <div class="text-center mt-6">
+        <a href="{% url 'team_manage' team.id %}"
+           class="bg-brand hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
+          مشاهده تیم
+        </a>
       </div>
+    {% else %}
 
-      {% if form.non_field_errors %}
-        <div class="bg-red-50 border border-red-300 text-red-800 text-sm rounded-lg p-3 mt-4">
-          {% for error in form.non_field_errors %}
-            <p>⚠ {{ error }}</p>
-          {% endfor %}
+      <h1 class="text-2xl font-bold text-brand mb-4">👥 ایجاد تیم جدید</h1>
+      <p class="text-gray-600 mb-6">
+        لطفاً نام تیم خود را وارد کنید. شما به‌عنوان <strong>نماینده</strong> شناخته می‌شوید و مسئول افزودن اعضا خواهید بود.
+      </p>
+
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <div>
+          <label for="{{ form.name.id_for_label }}" class="block text-gray-800 font-semibold mb-1">
+            نام تیم
+          </label>
+          {{ form.name|add_class:"w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand" }}
+
+          {% if form.name.errors %}
+            {% for error in form.name.errors %}
+              <p class="text-sm text-red-600 mt-1">⚠ {{ error }}</p>
+            {% endfor %}
+          {% endif %}
         </div>
-      {% endif %}
 
-      <div class="pt-4 text-center">
-        <button type="submit"
-          class="bg-brand hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
-          ➕ ایجاد تیم
-        </button>
+        {% if form.non_field_errors %}
+          <div class="bg-red-50 border border-red-300 text-red-800 text-sm rounded-lg p-3 mt-4">
+            {% for error in form.non_field_errors %}
+              <p>⚠ {{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="pt-4 text-center">
+          <button type="submit"
+            class="bg-brand hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
+            ➕ ایجاد تیم
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-8 text-gray-600 text-sm border-t pt-4">
+        پس از ایجاد تیم، به صفحهٔ مدیریت اعضا منتقل می‌شوید تا سایر اعضا را اضافه کنید.
       </div>
-    </form>
 
-    <div class="mt-8 text-gray-600 text-sm border-t pt-4">
-      پس از ایجاد تیم، به صفحهٔ مدیریت اعضا منتقل می‌شوید تا سایر اعضا را اضافه کنید.
-    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
