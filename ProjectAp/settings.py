@@ -26,8 +26,7 @@ SECRET_KEY = "django-insecure-n-eb3-$m#p0_f*frk%jd^a2jubovtq1s!(nvo^%hil*^kgr@yz
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS=['https://fctfd-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link/',
-                      'http://haijc-2a02-4540-6c-bd04-f81e-7c2-88c9-bfdb.a.free.pinggy.link']
+CSRF_TRUSTED_ORIGINS=['https://projects.shraif.ir','http://projects.shraif.ir']
 
 
 # Application definition
