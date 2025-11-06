@@ -2,64 +2,134 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Project Registration{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}سامانه ثبت پروژه‌ها{% endblock %}</title>
+  <script src="https://cdn.shraif.ir/cdn/ictc/pinghub/tailwindcss.js"></script>
 
-    <script>
-        tailwind.config = {theme: {extend: {colors: {brand: "#1966ab"}}}};
-    </script>
-    <style>
-        input, select, textarea {
-            font-family: "Vazirmatn", "Segoe UI", sans-serif;
-            direction: rtl;
-        }
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: { colors: { brand: "#1966ab" } }
+      }
+    };
+  </script>
 
-        label {
-            direction: rtl;
-        }
-    </style>
+  <!-- فونت IRANSansX -->
+  <style>
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Regular.ttf") format("truetype");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Medium.ttf") format("truetype");
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: "IRANSansX";
+      src: url("https://cdn.shraif.ir/cdn/ictc/tempalte/fonts/IRANSansX-Bold.ttf") format("truetype");
+      font-weight: 700;
+    }
 
+    body, input, select, textarea, label, button {
+      font-family: "IRANSansX", "Vazirmatn", "Segoe UI", sans-serif;
+      direction: rtl;
+    }
 
+    
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
-<header class="bg-brand text-white shadow">
-    <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
-        <a href="/" class="font-bold text-lg">🔷 سامانه پروژه‌ها</a>
-        <nav class="flex gap-3 text-sm">
-            <a href="/" class="hover:underline">خانه</a>
 
-            <a href="{% url 'users:profile' %}" class="hover:underline"> پروفایل کاربری</a>
-            <a href="{% url 'users:force_password_change' %}" class="hover:underline">تغیر رمز ورود</a>
-            {% if user.is_authenticated and user.is_staff %}
-                <a href="{% url 'projects:admin_assign' %}">مدیریت</a>
-                <a href="{% url 'projects:distribute' %}">توزیع خودکار</a>
-            {% endif %}
-            {% if user.is_authenticated %}
-                <form action="{% url 'users:logout' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="hover:underline text-red-600">خروج</button>
-                </form>
-            {% else %}
-                <a href="{% url 'users:login' %}">ورود</a>
-                <a href="{% url 'users:register' %}">ثبت‌نام</a>
-            {% endif %}
-        </nav>
-    </div>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col transition-colors duration-300">
+<header class="bg-[#1966ab] text-white shadow-md transition-colors duration-300">
+  <div class="max-w-6xl mx-auto px-5 py-3 flex justify-between items-center">
+    <div class="text-lg font-bold">سامانه ثبت پروژه‌های درسی</div>
+
+    <!-- دکمه تغییر تم -->
+    <button id="theme-toggle"
+            class="text-sm font-medium bg-white/10 hover:bg-white/20 px-3 py-1 rounded-md transition">
+      🌓 تغییر تم
+    </button>
+
+    <!-- دکمه منو برای موبایل -->
+    <button id="menu-toggle" class="sm:hidden text-sm font-medium bg-white/10 hover:bg-white/20 px-3 py-1 rounded-md transition">
+      منو ▾
+    </button>
+  </div>
+
+  <!-- منوی اصلی -->
+  <nav id="main-menu" class="hidden sm:flex flex-wrap gap-4 justify-center text-sm font-medium pb-3">
+    <a href="/" class="hover:bg-white/20 px-2 py-1 rounded-md transition">خانه</a>
+    <a href="{% url 'users:profile' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">پروفایل کاربری</a>
+    <a href="{% url 'users:force_password_change' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">تغییر رمز عبور</a>
+
+    {% if user.is_authenticated and user.is_staff %}
+      <a href="{% url 'projects:admin_assign' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">مدیریت پروژه‌ها</a>
+      <a href="{% url 'projects:distribute' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">توزیع خودکار</a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <form action="{% url 'users:logout' %}" method="post" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="hover:bg-white/20 px-2 py-1 rounded-md text-red-100">خروج</button>
+      </form>
+    {% else %}
+      <a href="{% url 'users:login' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">ورود</a>
+      <a href="{% url 'users:register' %}" class="hover:bg-white/20 px-2 py-1 rounded-md transition">ثبت‌نام</a>
+    {% endif %}
+  </nav>
+
+  <!-- منوی موبایل -->
+  <div id="mobile-menu" class="hidden sm:hidden bg-[#1966ab] border-t border-white/20 px-5 py-2 flex flex-col gap-2 text-sm font-medium">
+    <a href="/" class="hover:bg-white/20 px-2 py-1 rounded-md">خانه</a>
+    <a href="{% url 'users:profile' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">پروفایل کاربری</a>
+    <a href="{% url 'users:force_password_change' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">تغییر رمز عبور</a>
+
+    {% if user.is_authenticated and user.is_staff %}
+      <a href="{% url 'projects:admin_assign' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">مدیریت پروژه‌ها</a>
+      <a href="{% url 'projects:distribute' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">توزیع خودکار</a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <form action="{% url 'users:logout' %}" method="post" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="hover:bg-white/20 px-2 py-1 rounded-md text-red-200">خروج</button>
+      </form>
+    {% else %}
+      <a href="{% url 'users:login' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">ورود</a>
+      <a href="{% url 'users:register' %}" class="hover:bg-white/20 px-2 py-1 rounded-md">ثبت‌نام</a>
+    {% endif %}
+  </div>
 </header>
 
 <main class="flex-1 max-w-5xl mx-auto w-full p-4">
-    {% for message in messages %}
-        <div class="p-3 rounded mb-3 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
-            {{ message }}
-        </div>
-    {% endfor %}
-    {% block content %}{% endblock %}
+  {% for message in messages %}
+    <div class="message border rounded p-3 mb-3 
+      {% if message.tags == 'success' %}bg-green-100 text-green-800
+      {% elif message.tags == 'error' %}bg-red-100 text-red-800
+      {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800
+      {% else %}bg-blue-100 text-blue-800{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+  {% block content %}{% endblock %}
 </main>
 
 <footer class="bg-white border-t py-3 text-center text-xs text-gray-500">
     © 2025 Sharif AP Portal • Developed by Hossein Masihi
 </footer>
+
+<script>
+
+  // ---- منوی موبایل ----
+  const toggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  toggle?.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+  window.addEventListener("resize", () => {
+    if (window.innerWidth >= 640) mobileMenu.classList.add("hidden");
+  });
+</script>
 </body>
 </html>

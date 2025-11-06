@@ -45,9 +45,9 @@ class StudentRegisterForm(UserCreationForm):
 
 
 class StudentLoginForm(AuthenticationForm):
-    captcha = CaptchaField(label="کد امنیتی")
-    username = forms.CharField(label="نام کاربری یا شماره دانشجویی")
-    password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput)
+    captcha = CaptchaField(label="کد امنیتی" ,)
+    username = forms.CharField(label="نام کاربری یا شماره دانشجویی", max_length=100, widget=forms.TextInput(attrs={'class': 'form-input'}))
+    password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput(attrs={'class': 'form-input'}))
 
 class StudentCSVUploadForm(forms.Form):
     csv_file = forms.FileField(
