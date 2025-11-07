@@ -9,17 +9,21 @@ def create_students_from_csv(file):
 
     for row in reader:
         sid = row["student_id"].strip()
-        email = row["email"].strip()
-        username = email.split("@")[0]
+        email = row.get("email","").strip()
+        first_name = row.get("first_name","").strip()
+        last_name = row.get("last_name","").strip()
         password = secrets.token_urlsafe(8)
         user, created = User.objects.get_or_create(
             student_id=sid,
             defaults={
-                "username": username,
+                "username": sid,
                 "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
                 "is_representative": True,
                 "must_change_password": True,
             }
+
         )
         if created:
             user.set_password(password)
