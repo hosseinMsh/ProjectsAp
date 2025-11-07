@@ -72,8 +72,7 @@ class Team(models.Model):
 
         # --- your previous rules ---
         size = self.members.count() + 1  # include representative
-        if size < 3:
-            raise ValidationError(_("Team must have at least 3 members (including representative)."))
+        print(self.members.count() , size)
         if size > 4:
             raise ValidationError(_("Team cannot have more than 4 members."))
 
@@ -81,7 +80,7 @@ class Team(models.Model):
             four_count = Team.objects.exclude(pk=self.pk).annotate(
                 sz=models.Count("members")
             ).filter(sz=3).count()
-            if four_count >= 2:
+            if four_count >= 5:
                 raise ValidationError(_("Only two teams of size 4 are allowed."))
 
         if self.final_project:
@@ -91,3 +90,19 @@ class Team(models.Model):
                 raise ValidationError(_("This project is already assigned to another team."))
     def __str__(self):
         return f"{self.name}"
+
+class TeamInvite(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="invites")
+    student = models.ForeignKey("users.Student", on_delete=models.CASCADE, related_name="team_invites")
+    status = models.CharField(
+        max_length=20,
+        choices=[("pending", "Pending"), ("accepted", "Accepted"), ("rejected", "Rejected")],
+        default="pending"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("team", "student")
+
+    def __str__(self):
+        return f"Invite: {self.student} -> {self.team} ({self.status})"

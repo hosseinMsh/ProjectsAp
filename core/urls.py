@@ -1,7 +1,7 @@
 # projects/urls.py
 from django.urls import path
 from .views import team_create, team_manage, project_select, admin_assign, distribute_projects, export_csv, \
-    teams_overview
+    teams_overview, invites_list, invite_response
 
 urlpatterns = [
     path("team/create/", team_create, name="team_create"),
@@ -12,4 +12,6 @@ urlpatterns = [
 
     path("distribute/", distribute_projects, name="distribute"),
     path("export/", export_csv, name="export_csv"),
+    path("invites/", invites_list, name="invites_list"),
+    path("invites/<int:invite_id>/<str:action>/", invite_response, name="invite_response"),
 ]

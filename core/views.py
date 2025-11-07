@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from users.models import Student
-from .models import Team, Project, Config
+from .models import Team, Project, Config, TeamInvite
 from .forms import TeamCreateForm, TeamMembersForm, ProjectChoiceForm
 import csv
 
@@ -108,24 +108,33 @@ def team_manage(request, pk):
         if form.is_valid():
             ids = [s.strip() for s in form.cleaned_data["member_student_ids"].splitlines() if s.strip()]
             with transaction.atomic():
-                # clear all except representative (kept)
-                team.members.set([request.user])
+                team.members.set([request.user])  # keep representative only
+
                 for sid in ids:
                     try:
                         stu = Student.objects.get(student_id=sid)
                         if stu == request.user:
                             continue
-                        team.members.add(stu)
+
+                        invite, created = TeamInvite.objects.get_or_create(team=team, student=stu)
+                        # if invite was rejected earlier, make it pending again
+                        if invite.status == "rejected":
+                            invite.status = "pending"
+                            invite.save()
+
                     except Student.DoesNotExist:
                         messages.warning(request, f"Student ID not found: {sid}")
+
                 try:
                     team.full_clean()
                     team.save()
-                    messages.success(request, "Members updated.")
+                    messages.success(request, "Members updated. Pending invites were created.")
                 except Exception as e:
                     transaction.set_rollback(True)
                     messages.error(request, str(e))
+
             return redirect("projects:team_manage", pk=team.pk)
+
     else:
         form = TeamMembersForm()
 
@@ -190,3 +199,24 @@ def teams_overview(request):
     return render(request, "projects/teams_overview.html", {
         "teams": teams
     })
+
+@login_required
+def invites_list(request):
+    invites = TeamInvite.objects.filter(student=request.user, status="pending").select_related("team")
+    return render(request, "projects/invites_list.html", {"invites": invites})
+
+
+@login_required
+def invite_response(request, invite_id, action):
+    invite = get_object_or_404(TeamInvite, pk=invite_id, student=request.user)
+
+    if action == "accept":
+        invite.status = "accepted"
+        invite.save()
+        invite.team.members.add(request.user)
+
+    elif action == "reject":
+        invite.status = "rejected"
+        invite.save()
+
+    return redirect("projects:invites_list")
